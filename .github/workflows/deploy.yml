@@ -35,7 +35,7 @@ jobs:
       # Hostinger Direct FTP Deployment Step
       - name: 🚀 Deploy to Hostinger via FTP
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: SamKirland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
