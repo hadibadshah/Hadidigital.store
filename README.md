@@ -1,11 +1,29 @@
-<div align="center">
+# Hadi Digital Store (HDS) — hadidigital.store
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Official web application for **Hadi Digital Store (HDS)**.
 
-  <h1>Built with AI Studio</h2>
+## 🚀 Features
+- **Dark/Light Mode**: Premium dark theme by default with instant toggle.
+- **25,000+ Happy Customers Metric**: Proof of trust and market liquidity.
+- **EzToolbox Integration**: Link and featured section for `https://eztoolbox.xyz` (Free YouTube Channel & Video Analyzer, IP checker, USD to PKR live price, QR generator).
+- **VIP WhatsApp Integration**: Direct WhatsApp ordering (`+923116797819`) & WhatsApp Channel link.
+- **Hidden Admin Panel**: Access via footer discreet Admin button. Password protected (`admin123`) for managing products, prices, articles, and store settings.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## 📦 How to Deploy on Hostinger / GitHub
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+### 1. Build locally or via GitHub Actions
+Run the build command:
+```bash
+npm install
+npm run build
+```
+This generates a production-ready static website inside the `dist/` folder.
 
-</div>
+### 2. Uploading to Hostinger
+1. Log in to your Hostinger hPanel.
+2. Go to **File Manager** -> `public_html`.
+3. Upload all contents inside the `dist/` folder directly to `public_html`.
+4. Your site `hadidigital.store` will be live instantly!
+
+### 3. GitHub Actions
+When you push code to `main` or `master` branch on GitHub, GitHub Actions will automatically run `.github/workflows/deploy.yml` and produce a downloadable `hostinger-dist-build` artifact in the Actions tab.

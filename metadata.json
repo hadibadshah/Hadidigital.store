@@ -1,0 +1,6 @@
+{
+  "name": "Hadi Digital Store",
+  "description": "Premium Digital Solutions at Unbeatable Prices - Official store for Capcut Pro, ElevenLabs, ChatGPT Plus, YouTube Services & Courses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
