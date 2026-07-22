@@ -1,4 +1,4 @@
-name: Build and Deploy Hadi Digital Store
+name: Build and Deploy Hadi Digital Store to Hostinger
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +26,19 @@ jobs:
       - name: Build Web Application
         run: npm run build
 
-      - name: Upload Build Artifacts for Hostinger / Deployment
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: hostinger-dist-build
           path: dist/
+
+      # Hostinger Direct FTP Deployment Step
+      - name: 🚀 Deploy to Hostinger via FTP
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: SamKirland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: public_html/
+          local-dir: ./dist/
