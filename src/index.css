@@ -33,6 +33,34 @@
   -webkit-text-fill-color: transparent;
 }
 
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-pink-gold-gradient {
+  background: linear-gradient(
+    270deg,
+    #f43f5e,
+    #ec4899,
+    #fbbf24,
+    #f59e0b,
+    #fef08a,
+    #ec4899
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
 .gold-glow {
   box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
 }

@@ -56,7 +56,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               Verified Elite Provider
             </div>
             
-            <h1 className="text-4xl sm:text-6xl font-bold leading-[1.1] mb-6 font-heading text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-[#f59e0b]">
+            <h1 className="text-4xl sm:text-6xl font-bold leading-[1.1] mb-6 font-heading animated-pink-gold-gradient">
               Premium Digital <br/>
               <span>Solutions</span>
             </h1>

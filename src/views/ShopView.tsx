@@ -37,7 +37,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
           <Sparkles className="w-3.5 h-3.5" />
           OFFICIAL DIGITAL CATALOG
         </div>
-        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-[#f59e0b] mb-4 leading-tight">
+        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl animated-pink-gold-gradient mb-4 leading-tight">
           Explore Premium Tools & Services
         </h1>
         <p className="text-sm text-slate-300 leading-relaxed">
