@@ -2,6 +2,8 @@ export interface Product {
   id: number;
   name: string;
   price: string;
+  originalPrice?: string;
+  discountPercent?: number;
   badge: 'DEAL' | 'AL' | 'ELITE' | 'NEW' | 'GUARANTEED' | string;
   category: 'Tools' | 'AI' | 'YouTube' | 'Course' | string;
   image: string; // Emoji or image URL
@@ -41,6 +43,7 @@ export interface StoreSettings {
   ezToolboxLink?: string;
   youtubeLink: string;
   instagramLink: string;
+  facebookLink?: string;
   email: string;
   brandName: string;
   tagline: string;

@@ -62,7 +62,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, settings, onB
       <div className="pt-4 border-t border-white/10">
         <div className="flex items-baseline justify-between mb-4">
           <span className="text-xs text-slate-400 font-medium">Price</span>
-          <div className="text-right">
+          <div className="text-right flex items-baseline justify-end gap-2">
+            {product.originalPrice && (
+              <span className="text-xs text-slate-500 line-through font-medium">
+                {product.originalPrice}
+              </span>
+            )}
             <span className="font-heading font-extrabold text-lg text-[#f59e0b]">
               {product.price}
             </span>

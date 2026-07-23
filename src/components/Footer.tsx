@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, MessageCircle, Youtube, Instagram, Mail, ExternalLink, Heart } from 'lucide-react';
+import { ShieldCheck, MessageCircle, Youtube, Instagram, Facebook, Mail, ExternalLink, Heart, Globe } from 'lucide-react';
 import { StoreSettings } from '../types';
 import { getWhatsAppLink } from '../lib/whatsapp';
 
@@ -71,6 +71,15 @@ export const Footer: React.FC<FooterProps> = ({ navigate, settings }) => {
                   <Instagram className="w-4 h-4" />
                 </a>
               )}
+              <a
+                href={settings.facebookLink || 'https://www.facebook.com/hadidigital.store'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-lg bg-blue-600/10 text-blue-400 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all border border-blue-600/20"
+                title="Facebook Page"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
               {settings.email && (
                 <a
                   href={`mailto:${settings.email}`}
@@ -163,21 +172,23 @@ export const Footer: React.FC<FooterProps> = ({ navigate, settings }) => {
           <div className="space-y-4">
             <h4 className="font-heading font-bold text-white text-base mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-              Verified Payments
+              Verified Payments & Global Checkout
             </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
-              We accept instant local payments in Pakistan with 100% replacement warranty and immediate key delivery.
+              Local instant payments in Pakistan (JazzCash, EasyPaisa, Bank) & <strong>International Payments via WhatsApp</strong>.
             </p>
-            <div className="grid grid-cols-3 gap-2 text-[11px] font-bold">
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-bold">
               <div className="bg-red-950/40 text-red-300 border border-red-500/30 rounded-lg p-2 text-center">
-                JazzCash
-              </div>
-              <div className="bg-emerald-950/40 text-emerald-300 border border-emerald-500/30 rounded-lg p-2 text-center">
-                EasyPaisa
+                JazzCash / EasyPaisa
               </div>
               <div className="bg-blue-950/40 text-blue-300 border border-blue-500/30 rounded-lg p-2 text-center">
-                Bank Transfer
+                Bank Transfer (PKR)
               </div>
+            </div>
+
+            <div className="bg-purple-950/40 border border-purple-500/30 text-purple-200 rounded-xl p-2.5 text-xs flex items-center gap-2">
+              <Globe className="w-4 h-4 text-purple-400 shrink-0" />
+              <span><strong>International?</strong> Pay via Card/Wise/Crypto on WhatsApp!</span>
             </div>
 
             <div className="pt-2">

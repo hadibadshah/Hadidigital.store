@@ -33,6 +33,21 @@ export default function App() {
   // Global Search State
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // Light / Dark Theme State with Persistence
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('hds_theme') as 'dark' | 'light') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('hds_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Initialize data on mount & connect real-time Firebase Firestore database
   useEffect(() => {
     setProducts(getProducts());
@@ -184,6 +199,8 @@ export default function App() {
         isAdminLoggedIn={isAdminLoggedIn}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       {/* Main Content Area */}

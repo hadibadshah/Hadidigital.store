@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product, StoreSettings } from '../types';
-import { X, Send, ShieldCheck, CheckCircle, Sparkles, CreditCard } from 'lucide-react';
+import { X, Send, ShieldCheck, CheckCircle, Sparkles, CreditCard, Globe } from 'lucide-react';
 import { addOrder } from '../lib/storage';
 import { getWhatsAppLink, createOrderConfirmationMessage } from '../lib/whatsapp';
 
@@ -120,22 +120,35 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ product, settings,
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
               Preferred Payment Method
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {['JazzCash', 'EasyPaisa', 'Bank Transfer'].map((method) => (
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {['JazzCash', 'EasyPaisa', 'Bank Transfer', 'International Payment'].map((method) => (
                 <button
                   key={method}
                   type="button"
                   onClick={() => setPaymentMethod(method)}
-                  className={`py-2 px-2 text-xs font-bold rounded-xl border transition-all ${
+                  className={`py-2 px-2.5 text-xs font-bold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
                     paymentMethod === method
                       ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
                       : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
                   }`}
                 >
-                  {method}
+                  {method === 'International Payment' && <Globe className="w-3.5 h-3.5 text-purple-400 shrink-0" />}
+                  <span>{method}</span>
                 </button>
               ))}
             </div>
+
+            {paymentMethod === 'International Payment' && (
+              <div className="p-3 rounded-xl bg-purple-950/60 border border-purple-500/40 text-xs text-purple-200 space-y-1 my-2">
+                <p className="font-bold text-purple-300 flex items-center gap-1.5">
+                  <Globe className="w-4 h-4 text-purple-400" />
+                  International Order Support (Visa / Card / Wise / Crypto)
+                </p>
+                <p className="text-[11px] leading-relaxed text-purple-200/90">
+                  For customers outside Pakistan, please place your order below. Our VIP Concierge will provide direct payment details & invoice on WhatsApp!
+                </p>
+              </div>
+            )}
           </div>
 
           <div>

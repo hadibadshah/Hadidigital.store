@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, BookOpen, Info, PhoneCall, Sparkles, Search, Wrench, Menu, X } from 'lucide-react';
+import { ShoppingBag, BookOpen, Info, PhoneCall, Sparkles, Search, Wrench, Menu, X, Sun, Moon } from 'lucide-react';
 import { StoreSettings } from '../types';
 import { getWhatsAppLink } from '../lib/whatsapp';
 
@@ -10,6 +10,8 @@ interface NavbarProps {
   isAdminLoggedIn?: boolean;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
+  theme?: 'dark' | 'light';
+  toggleTheme?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -17,7 +19,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   navigate, 
   settings, 
   searchQuery = '', 
-  setSearchQuery 
+  setSearchQuery,
+  theme = 'dark',
+  toggleTheme
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -118,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 placeholder="Search tools & guides..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="bg-slate-900/90 border border-slate-700/80 focus:border-[#f59e0b] rounded-full pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none transition-all w-40 lg:w-56 focus:w-64"
+                className="bg-slate-900/90 border border-slate-700/80 focus:border-[#f59e0b] rounded-full pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none transition-all w-36 lg:w-52 focus:w-60"
                 id="header-search-input"
               />
               {searchQuery && (
@@ -131,12 +135,34 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
             </div>
+
+            {/* Light / Dark Mode Toggle Button (Desktop) */}
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                id="theme-toggle-desktop"
+                className="p-2 rounded-full bg-slate-800/80 hover:bg-amber-500/20 text-amber-400 border border-slate-700 hover:border-amber-500/40 transition-all flex items-center gap-1.5 text-xs font-bold shrink-0"
+                title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="w-4 h-4 text-amber-400 animate-spin-slow" />
+                    <span className="hidden lg:inline text-[11px] text-amber-300">Light</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                    <span className="hidden lg:inline text-[11px] text-indigo-300">Dark</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Mobile Search Icon / Bar & Menu Toggle */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-1.5 md:hidden">
             {/* Small Mobile Search Input */}
-            <div className="relative flex items-center w-36 sm:w-48">
+            <div className="relative flex items-center w-28 sm:w-40">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
               <input
                 type="text"
@@ -154,6 +180,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
             </div>
+
+            {/* Light / Dark Mode Toggle Button (Mobile Header) */}
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                id="theme-toggle-mobile-header"
+                className="p-1.5 rounded-xl bg-slate-800 text-amber-400 border border-slate-700 shrink-0"
+                title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+              </button>
+            )}
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -195,6 +233,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
 
           <div className="pt-3 border-t border-slate-700/50 flex flex-col gap-2">
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-sm"
+              >
+                <div className="flex items-center gap-2.5">
+                  {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+                  <span>Appearance / Theme Mode</span>
+                </div>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 uppercase">
+                  {theme === 'dark' ? 'Dark' : 'Light'}
+                </span>
+              </button>
+            )}
+
             <a
               href={ezLink}
               target="_blank"

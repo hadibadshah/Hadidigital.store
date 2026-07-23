@@ -60,14 +60,116 @@ export const AdminView: React.FC<AdminViewProps> = ({
   // Edit Price Inline State: { [productId]: price }
   const [editingPrices, setEditingPrices] = useState<{ [key: number]: string }>({});
 
-  // Add Product Modal / Form State
-  const [showAddProductModal, setShowAddProductModal] = useState(false);
-  const [newProductName, setNewProductName] = useState('');
-  const [newProductPrice, setNewProductPrice] = useState('');
-  const [newProductCategory, setNewProductCategory] = useState('Tools');
-  const [newProductBadge, setNewProductBadge] = useState('DEAL');
-  const [newProductImage, setNewProductImage] = useState('🎬');
-  const [newProductDescription, setNewProductDescription] = useState('');
+  // Add / Edit Product Modal & Form State
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    category: 'Tools',
+    price: '',
+    originalPrice: '',
+    discountPercent: '',
+    badge: 'DEAL',
+    image: '🎬',
+    description: '',
+    isHidden: false,
+    featured: true,
+  });
+
+  const handleOpenAddProduct = () => {
+    setEditingProductId(null);
+    setProductForm({
+      name: '',
+      category: 'Tools',
+      price: '',
+      originalPrice: '',
+      discountPercent: '',
+      badge: 'DEAL',
+      image: '🎬',
+      description: '',
+      isHidden: false,
+      featured: true,
+    });
+    setShowProductModal(true);
+  };
+
+  const handleOpenEditProduct = (prod: Product) => {
+    setEditingProductId(prod.id);
+    setProductForm({
+      name: prod.name,
+      category: prod.category || 'Tools',
+      price: prod.price || '',
+      originalPrice: prod.originalPrice || '',
+      discountPercent: prod.discountPercent !== undefined ? String(prod.discountPercent) : '',
+      badge: prod.badge || 'DEAL',
+      image: prod.image || '📦',
+      description: prod.description || '',
+      isHidden: !!prod.isHidden,
+      featured: prod.featured !== false,
+    });
+    setShowProductModal(true);
+  };
+
+  const applyQuickDiscount = (pct: number) => {
+    const numFromPrice = parseInt(productForm.price.replace(/[^0-9]/g, '')) || 0;
+    const numFromOrig = parseInt(productForm.originalPrice.replace(/[^0-9]/g, '')) || 0;
+    const base = numFromOrig || numFromPrice;
+
+    if (!base) return;
+
+    const originalStr = productForm.originalPrice || productForm.price || `${base} PKR`;
+    const discountedNum = Math.round(base * (1 - pct / 100));
+    const discountedStr = `${discountedNum} PKR`;
+
+    setProductForm(prev => ({
+      ...prev,
+      originalPrice: originalStr,
+      price: discountedStr,
+      discountPercent: String(pct),
+      badge: `${pct}% OFF`,
+    }));
+  };
+
+  const clearDiscount = () => {
+    const origStr = productForm.originalPrice || productForm.price;
+    setProductForm(prev => ({
+      ...prev,
+      price: origStr,
+      originalPrice: '',
+      discountPercent: '',
+      badge: 'DEAL',
+    }));
+  };
+
+  const handleSaveProductModal = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productForm.name.trim() || !productForm.price.trim()) return;
+
+    const updatedProd: Product = {
+      id: editingProductId ? editingProductId : Date.now(),
+      name: productForm.name,
+      price: productForm.price,
+      originalPrice: productForm.originalPrice || undefined,
+      discountPercent: productForm.discountPercent ? Number(productForm.discountPercent) : undefined,
+      category: productForm.category,
+      badge: productForm.badge,
+      image: productForm.image || '📦',
+      description: productForm.description,
+      isHidden: productForm.isHidden,
+      featured: productForm.featured,
+    };
+
+    let updatedList: Product[];
+    if (editingProductId) {
+      updatedList = products.map(p => p.id === editingProductId ? updatedProd : p);
+    } else {
+      updatedList = [...products, updatedProd];
+    }
+
+    setProducts(updatedList);
+    saveProducts(updatedList);
+    setShowProductModal(false);
+  };
 
   // Add Article Modal State
   const [showAddArticleModal, setShowAddArticleModal] = useState(false);
@@ -166,30 +268,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
     }
   };
 
-  const handleAddProduct = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newProductName.trim() || !newProductPrice.trim()) return;
 
-    const newProd: Product = {
-      id: Date.now(),
-      name: newProductName,
-      price: newProductPrice,
-      category: newProductCategory,
-      badge: newProductBadge,
-      image: newProductImage || '📦',
-      description: newProductDescription,
-      isHidden: false,
-    };
-
-    const updated = [...products, newProd];
-    setProducts(updated);
-    saveProducts(updated);
-
-    setShowAddProductModal(false);
-    setNewProductName('');
-    setNewProductPrice('');
-    setNewProductDescription('');
-  };
 
   // 2. ORDERS MANAGEMENT FUNCTIONS
   const handleUpdateOrderStatus = (orderId: string, status: 'Pending' | 'Completed' | 'Cancelled') => {
@@ -413,13 +492,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowExportModal(true)}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                className="bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-extrabold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
               >
-                <Code className="w-4 h-4" />
-                <span>Export / Sync for Hostinger</span>
+                <Code className="w-4 h-4 text-emerald-400" />
+                <span>Firebase Live Sync Info & Backup</span>
               </button>
               <button
-                onClick={() => setShowAddProductModal(true)}
+                onClick={handleOpenAddProduct}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all"
               >
                 <Plus className="w-4 h-4" />
@@ -437,8 +516,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   <th className="p-4">Icon / Name</th>
                   <th className="p-4">Category</th>
                   <th className="p-4">Badge</th>
-                  <th className="p-4">Price (Edit + Save)</th>
-                  <th className="p-4 text-center">Show / Hide</th>
+                  <th className="p-4">Price / Offer</th>
+                  <th className="p-4 text-center">Visibility</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -468,30 +547,36 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       </td>
 
                       <td className="p-4">
-                        <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold border border-amber-500/30 uppercase">
+                        <span className="bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full text-[10px] font-extrabold border border-amber-500/30 uppercase">
                           {product.badge}
                         </span>
                       </td>
 
-                      {/* Edit Price Field + Save Button */}
+                      {/* Edit Price Field + Cut Price Display */}
                       <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={currentPriceVal}
-                            onChange={(e) => handlePriceChange(product.id, e.target.value)}
-                            className="bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-lg px-2.5 py-1.5 text-xs text-amber-400 font-bold w-28"
-                          />
-                          {isEditingPrice && (
-                            <button
-                              onClick={() => handleSavePrice(product.id)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-lg text-xs flex items-center gap-1 font-bold shadow"
-                              title="Save Price"
-                            >
-                              <Save className="w-3.5 h-3.5" />
-                              <span>Save</span>
-                            </button>
+                        <div className="space-y-1">
+                          {product.originalPrice && (
+                            <div className="text-[10px] text-slate-500 line-through font-semibold">
+                              Was: {product.originalPrice}
+                            </div>
                           )}
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={currentPriceVal}
+                              onChange={(e) => handlePriceChange(product.id, e.target.value)}
+                              className="bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-lg px-2.5 py-1 text-xs text-amber-400 font-bold w-28"
+                            />
+                            {isEditingPrice && (
+                              <button
+                                onClick={() => handleSavePrice(product.id)}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white p-1 rounded-lg text-xs flex items-center gap-1 font-bold shadow"
+                                title="Save Price"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </td>
 
@@ -520,13 +605,23 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       </td>
 
                       <td className="p-4 text-right">
-                        <button
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition-colors"
-                          title="Delete Product"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleOpenEditProduct(product)}
+                            className="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                            title="Edit full product details & offer discount"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition-colors"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -737,7 +832,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
                   YouTube Channel Link
@@ -746,7 +841,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   type="text"
                   value={settingsForm.youtubeLink}
                   onChange={(e) => setSettingsForm({ ...settingsForm, youtubeLink: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
 
@@ -758,7 +853,20 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   type="text"
                   value={settingsForm.instagramLink}
                   onChange={(e) => setSettingsForm({ ...settingsForm, instagramLink: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Facebook Page Link
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://www.facebook.com/hadidigital.store"
+                  value={settingsForm.facebookLink || ''}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, facebookLink: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
             </div>
@@ -797,43 +905,135 @@ export const AdminView: React.FC<AdminViewProps> = ({
         </div>
       )}
 
-      {/* ADD PRODUCT MODAL */}
-      {showAddProductModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="relative w-full max-w-lg glass-panel-gold rounded-3xl p-6 shadow-2xl border border-amber-500/30 space-y-4">
-            <h3 className="font-heading font-bold text-xl text-white">Add New Product</h3>
-            <form onSubmit={handleAddProduct} className="space-y-3">
+      {/* FULL ADD / EDIT PRODUCT MODAL WITH DISCOUNT OFFER SYSTEM */}
+      {showProductModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-xl glass-panel-gold rounded-3xl p-6 my-8 shadow-2xl border border-amber-500/40 space-y-4 text-slate-100 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
               <div>
-                <label className="block text-xs text-slate-300 mb-1">Product Name</label>
+                <h3 className="font-heading font-extrabold text-xl text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                  <span>{editingProductId ? 'Edit Product & Discount Offer' : 'Add New Product'}</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Editable title, description, category, price, and instant percentage discount offers.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowProductModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProductModal} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Product Name / Title
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Midjourney Pro"
-                  value={newProductName}
-                  onChange={(e) => setNewProductName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                  placeholder="e.g. Capcut Pro / ChatGPT Plus / Canva Pro"
+                  value={productForm.name}
+                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:border-amber-500 focus:outline-none"
                 />
               </div>
 
+              {/* Price & Cut Price */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Price (e.g. 1200 PKR or DM to Buy)</label>
+                  <label className="block text-xs font-semibold text-amber-400 mb-1">
+                    Selling Price (e.g. 800 PKR or DM to Buy)
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="1200 PKR"
-                    value={newProductPrice}
-                    onChange={(e) => setNewProductPrice(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                    placeholder="800 PKR"
+                    value={productForm.price}
+                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                    className="w-full bg-slate-950 border border-amber-500/50 rounded-xl px-3.5 py-2.5 text-xs text-amber-300 font-bold focus:border-amber-400 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">
+                    Original Price (Cut Price / Strikethrough)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 1600 PKR"
+                    value={productForm.originalPrice}
+                    onChange={(e) => setProductForm({ ...productForm, originalPrice: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-300 line-through focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Quick Offer Discount Presets */}
+              <div className="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Quick Offer Discount Presets:</span>
+                  </span>
+                  {productForm.discountPercent && (
+                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                      {productForm.discountPercent}% Discount Applied
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => applyQuickDiscount(10)}
+                    className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-extrabold transition-all"
+                  >
+                    10% OFF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyQuickDiscount(20)}
+                    className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-extrabold transition-all"
+                  >
+                    20% OFF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyQuickDiscount(30)}
+                    className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-extrabold transition-all"
+                  >
+                    30% OFF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyQuickDiscount(50)}
+                    className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 rounded-xl text-xs font-black shadow-md transition-all hover:scale-105"
+                  >
+                    🔥 50% OFF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearDiscount}
+                    className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-xl text-xs font-semibold transition-all ml-auto"
+                  >
+                    Clear Offer
+                  </button>
+                </div>
+              </div>
+
+              {/* Category & Badge & Icon */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
                   <select
-                    value={newProductCategory}
-                    onChange={(e) => setNewProductCategory(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                    value={productForm.category}
+                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
                   >
                     <option value="Tools">Tools</option>
                     <option value="AI">AI</option>
@@ -841,55 +1041,81 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     <option value="Course">Course</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Badge Tag</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Badge Tag</label>
                   <input
                     type="text"
-                    placeholder="DEAL / NEW / ELITE"
-                    value={newProductBadge}
-                    onChange={(e) => setNewProductBadge(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                    placeholder="e.g. 50% OFF / DEAL / NEW"
+                    value={productForm.badge}
+                    onChange={(e) => setProductForm({ ...productForm, badge: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Icon Emoji</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Icon Emoji</label>
                   <input
                     type="text"
-                    placeholder="🎨"
-                    value={newProductImage}
-                    onChange={(e) => setNewProductImage(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                    placeholder="🎬"
+                    value={productForm.image}
+                    onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white text-center text-lg focus:outline-none"
                   />
                 </div>
               </div>
 
+              {/* Description */}
               <div>
-                <label className="block text-xs text-slate-300 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Product Description / Key Benefits
+                </label>
                 <textarea
                   rows={3}
-                  value={newProductDescription}
-                  onChange={(e) => setNewProductDescription(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white resize-none"
+                  value={productForm.description}
+                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white resize-none focus:border-amber-500 focus:outline-none"
+                  placeholder="Detailed description of features, account duration, replacement warranty..."
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              {/* Visibility & Featured Checkboxes */}
+              <div className="flex items-center gap-6 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={productForm.isHidden}
+                    onChange={(e) => setProductForm({ ...productForm, isHidden: e.target.checked })}
+                    className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-amber-500 focus:ring-0"
+                  />
+                  <span>Hide from Shop (Draft)</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={productForm.featured}
+                    onChange={(e) => setProductForm({ ...productForm, featured: e.target.checked })}
+                    className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-amber-500 focus:ring-0"
+                  />
+                  <span>Show on Home Showcase</span>
+                </label>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setShowAddProductModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold"
+                  onClick={() => setShowProductModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold"
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-extrabold shadow-lg transition-all"
                 >
-                  Add Product
+                  {editingProductId ? 'Save Changes' : 'Publish Product'}
                 </button>
               </div>
             </form>
@@ -985,12 +1211,12 @@ export const AdminView: React.FC<AdminViewProps> = ({
       {/* EXPORT & SYNC CATALOG MODAL */}
       {showExportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="relative w-full max-w-2xl glass-panel-gold rounded-3xl p-6 shadow-2xl border border-amber-500/30 space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl glass-panel-gold rounded-3xl p-6 shadow-2xl border border-emerald-500/30 space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Code className="w-5 h-5 text-amber-400" />
+                <Sparkles className="w-5 h-5 text-emerald-400" />
                 <h3 className="font-heading font-bold text-lg text-white">
-                  Sync Products with Hostinger & GitHub
+                  Firebase Live Database Connected!
                 </h3>
               </div>
               <button
@@ -1002,21 +1228,22 @@ export const AdminView: React.FC<AdminViewProps> = ({
             </div>
 
             {/* Explanation card */}
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-200/90 leading-relaxed space-y-2">
-              <p className="font-bold text-amber-400 text-sm flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4" /> Why do products need Syncing for Hostinger?
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-xs text-emerald-200/90 leading-relaxed space-y-2">
+              <p className="font-bold text-emerald-400 text-sm flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Real-Time Cloud Synchronization Active
               </p>
               <p>
-                Hostinger serves static built code compiled from GitHub. Any products you add in this Admin panel are stored in your browser's local cache.
+                Your store is now connected directly to <strong>Google Firebase Firestore Cloud Database</strong> (<code>hadi-tool-service</code>).
               </p>
               <p>
-                To make your new products permanent for <strong>all visitors on hadidigital.store</strong>:
+                <strong>No manual copy-paste or GitHub rebuild is required anymore!</strong>
               </p>
-              <ol className="list-decimal list-inside space-y-1 font-semibold text-slate-200 pl-2">
-                <li>Click <strong>"Copy Catalog Data"</strong> below.</li>
-                <li>Paste it in AI Studio chat (e.g. <em>"Please update initialData.ts with my products"</em>).</li>
-                <li>AI Studio updates the repository code, and GitHub Actions deploys it live to Hostinger automatically!</li>
-              </ol>
+              <ul className="list-disc list-inside space-y-1 font-semibold text-slate-200 pl-2">
+                <li>When you add or edit a product here, it updates in Firebase Cloud instantly.</li>
+                <li>All website visitors globally (on Hostinger & AI Studio) see changes in real-time.</li>
+                <li>Orders placed by customers are stored directly in your Firebase cloud database.</li>
+              </ul>
             </div>
 
             {/* Export Section */}
@@ -1024,7 +1251,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                   <Download className="w-4 h-4 text-emerald-400" />
-                  <span>Current Catalog Data ({products.length} products)</span>
+                  <span>Catalog Backup JSON ({products.length} products)</span>
                 </label>
                 <button
                   type="button"
@@ -1032,12 +1259,12 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-md"
                 >
                   {copySuccess ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copySuccess ? 'Copied to Clipboard!' : 'Copy Catalog Data'}</span>
+                  <span>{copySuccess ? 'Copied to Clipboard!' : 'Copy Backup Data'}</span>
                 </button>
               </div>
               <textarea
                 readOnly
-                rows={7}
+                rows={6}
                 value={JSON.stringify(products, null, 2)}
                 className="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-emerald-300 resize-none focus:outline-none"
               />

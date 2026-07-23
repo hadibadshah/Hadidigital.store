@@ -1,0 +1,6 @@
+# Robots.txt for https://hadidigital.store
+User-agent: *
+Allow: /
+
+# Sitemap Location for Google Search Console & Search Engines
+Sitemap: https://hadidigital.store/sitemap.xml

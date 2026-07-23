@@ -130,7 +130,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <p className="text-xs text-slate-400 line-clamp-2">{product.description}</p>
                   </div>
                   <div className="mt-6 flex items-center justify-between pt-3 border-t border-white/10">
-                    <span className="font-extrabold text-[#f59e0b] text-base sm:text-lg">{product.price}</span>
+                    <div className="flex items-baseline gap-1.5">
+                      {product.originalPrice && (
+                        <span className="text-xs text-slate-500 line-through font-semibold">
+                          {product.originalPrice}
+                        </span>
+                      )}
+                      <span className="font-extrabold text-[#f59e0b] text-base sm:text-lg">{product.price}</span>
+                    </div>
                     {isDMToBuy ? (
                       <a 
                         href={waMsg}
