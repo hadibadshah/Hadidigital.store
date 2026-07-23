@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Article, Order, StoreSettings } from './types';
-import { getProducts, getArticles, getOrders, getSettings } from './lib/storage';
+import { getProducts, getArticles, getOrders, getSettings, subscribeToFirestore } from './lib/storage';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -33,12 +33,20 @@ export default function App() {
   // Global Search State
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Initialize data on mount
+  // Initialize data on mount & connect real-time Firebase Firestore database
   useEffect(() => {
     setProducts(getProducts());
     setArticles(getArticles());
     setOrders(getOrders());
     setSettings(getSettings());
+
+    // Connect real-time Firebase sync
+    const unsubscribeFirebase = subscribeToFirestore({
+      onProducts: (prods) => setProducts(prods),
+      onArticles: (arts) => setArticles(arts),
+      onOrders: (ords) => setOrders(ords),
+      onSettings: (setts) => setSettings(setts),
+    });
 
     // Hash router handler
     const handleHashChange = () => {
@@ -48,7 +56,10 @@ export default function App() {
 
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      unsubscribeFirebase();
+    };
   }, []);
 
   // Custom navigate function using location hash

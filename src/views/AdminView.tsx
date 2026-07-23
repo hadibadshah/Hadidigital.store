@@ -17,7 +17,11 @@ import {
   Save, 
   RotateCcw,
   Sparkles,
-  Search
+  Search,
+  Copy,
+  Code,
+  Download,
+  Upload
 } from 'lucide-react';
 import { saveProducts, saveOrders, saveArticles, saveSettings, resetAllData } from '../lib/storage';
 
@@ -77,6 +81,39 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const [settingsForm, setSettingsForm] = useState<StoreSettings>(settings);
   const [settingsSuccessMsg, setSettingsSuccessMsg] = useState('');
 
+  // Export / Import Catalog Modal State
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [importJsonInput, setImportJsonInput] = useState('');
+  const [importError, setImportError] = useState('');
+  const [importSuccessMsg, setImportSuccessMsg] = useState('');
+
+  const handleCopyCatalog = () => {
+    const formatted = JSON.stringify(products, null, 2);
+    navigator.clipboard.writeText(formatted);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 3000);
+  };
+
+  const handleImportCatalog = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const parsed = JSON.parse(importJsonInput);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setProducts(parsed);
+        saveProducts(parsed);
+        setImportSuccessMsg(`Successfully imported ${parsed.length} products!`);
+        setImportError('');
+        setImportJsonInput('');
+        setTimeout(() => setImportSuccessMsg(''), 4000);
+      } else {
+        setImportError('Invalid JSON format: Must be a non-empty array of products.');
+      }
+    } catch (err) {
+      setImportError('Invalid JSON code. Please check syntax.');
+    }
+  };
+
   // Handle Login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +122,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
       setLoginError('');
       setPasswordInput('');
     } else {
-      setLoginError('Invalid admin password! Default password is "admin123"');
+      setLoginError('Invalid admin password! Access denied.');
     }
   };
 
@@ -247,7 +284,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             <div>
               <input
                 type="password"
-                placeholder="Enter password (default: admin123)"
+                placeholder="Enter password"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 className="w-full dark:bg-slate-950/80 bg-white border dark:border-slate-700 border-slate-300 focus:border-[#f59e0b] rounded-xl px-4 py-3 text-sm dark:text-white text-slate-900 dark:placeholder-slate-500 placeholder-slate-400 focus:outline-none transition-colors text-center"
@@ -267,10 +304,6 @@ export const AdminView: React.FC<AdminViewProps> = ({
               Unlock Admin Dashboard
             </button>
           </form>
-
-          <p className="text-[11px] dark:text-slate-500 text-slate-600">
-            Default password: <code className="text-[#f59e0b] font-bold dark:bg-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-[#f59e0b]/20">admin123</code>
-          </p>
         </div>
       </div>
     );
@@ -364,17 +397,35 @@ export const AdminView: React.FC<AdminViewProps> = ({
       {/* TAB 1: PRODUCTS MANAGEMENT */}
       {activeTab === 'products' && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between">
-            <h2 className="font-heading font-bold text-xl text-white">
-              Catalog Products & Live Prices
-            </h2>
-            <button
-              onClick={() => setShowAddProductModal(true)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Product</span>
-            </button>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="font-heading font-bold text-xl text-white flex items-center gap-2">
+                <span>Catalog Products & Live Prices</span>
+                <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Firebase Live DB
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Changes saved here instantly update globally across the website via Firebase Cloud Database!
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+              >
+                <Code className="w-4 h-4" />
+                <span>Export / Sync for Hostinger</span>
+              </button>
+              <button
+                onClick={() => setShowAddProductModal(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Product</span>
+              </button>
+            </div>
           </div>
 
           {/* Products Table */}
@@ -927,6 +978,111 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* EXPORT & SYNC CATALOG MODAL */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="relative w-full max-w-2xl glass-panel-gold rounded-3xl p-6 shadow-2xl border border-amber-500/30 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Code className="w-5 h-5 text-amber-400" />
+                <h3 className="font-heading font-bold text-lg text-white">
+                  Sync Products with Hostinger & GitHub
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="text-slate-400 hover:text-white text-xs font-bold px-2 py-1 bg-slate-800 rounded-lg"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Explanation card */}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-200/90 leading-relaxed space-y-2">
+              <p className="font-bold text-amber-400 text-sm flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4" /> Why do products need Syncing for Hostinger?
+              </p>
+              <p>
+                Hostinger serves static built code compiled from GitHub. Any products you add in this Admin panel are stored in your browser's local cache.
+              </p>
+              <p>
+                To make your new products permanent for <strong>all visitors on hadidigital.store</strong>:
+              </p>
+              <ol className="list-decimal list-inside space-y-1 font-semibold text-slate-200 pl-2">
+                <li>Click <strong>"Copy Catalog Data"</strong> below.</li>
+                <li>Paste it in AI Studio chat (e.g. <em>"Please update initialData.ts with my products"</em>).</li>
+                <li>AI Studio updates the repository code, and GitHub Actions deploys it live to Hostinger automatically!</li>
+              </ol>
+            </div>
+
+            {/* Export Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Download className="w-4 h-4 text-emerald-400" />
+                  <span>Current Catalog Data ({products.length} products)</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={handleCopyCatalog}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow-md"
+                >
+                  {copySuccess ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copySuccess ? 'Copied to Clipboard!' : 'Copy Catalog Data'}</span>
+                </button>
+              </div>
+              <textarea
+                readOnly
+                rows={7}
+                value={JSON.stringify(products, null, 2)}
+                className="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-emerald-300 resize-none focus:outline-none"
+              />
+            </div>
+
+            {/* Import Section */}
+            <div className="border-t border-slate-800 pt-4 space-y-3">
+              <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <Upload className="w-4 h-4 text-amber-400" />
+                <span>Import / Restore Products JSON</span>
+              </h4>
+              <form onSubmit={handleImportCatalog} className="space-y-2">
+                <textarea
+                  rows={3}
+                  placeholder="Paste products JSON here to load into browser..."
+                  value={importJsonInput}
+                  onChange={(e) => setImportJsonInput(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-slate-200 resize-none"
+                />
+                {importError && (
+                  <p className="text-xs text-red-400 font-semibold">{importError}</p>
+                )}
+                {importSuccessMsg && (
+                  <p className="text-xs text-emerald-400 font-semibold">{importSuccessMsg}</p>
+                )}
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="submit"
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold"
+                  >
+                    Import to Browser
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="flex justify-end border-t border-slate-800 pt-3">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-xs"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "product": {
+      "title": "Product",
+      "description": "Digital product catalog item in Hadi Digital Store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Product unique ID" },
+        "title": { "type": "string", "maxLength": 150 },
+        "tagline": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "price": { "type": "number" },
+        "originalPrice": { "type": "number" },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "badge": { "type": "string" },
+        "badgeColor": { "type": "string" },
+        "icon": { "type": "string" },
+        "features": { "type": "array" },
+        "deliveryTime": { "type": "string" },
+        "category": { "type": "string" },
+        "popular": { "type": "boolean" },
+        "instantAccess": { "type": "boolean" }
+      },
+      "required": ["id", "title", "price", "category"]
+    },
+    "article": {
+      "title": "Article",
+      "description": "Blog or guide article in Hadi Digital Store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string" },
+        "excerpt": { "type": "string", "maxLength": 500 },
+        "content": { "type": "string", "maxLength": 10000 },
+        "author": { "type": "string" },
+        "date": { "type": "string" },
+        "readTime": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array" },
+        "image": { "type": "string" }
+      },
+      "required": ["id", "title", "slug", "content"]
+    },
+    "order": {
+      "title": "Order",
+      "description": "Customer order in Hadi Digital Store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerWhatsApp": { "type": "string" },
+        "productId": { "type": "string" },
+        "productTitle": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string" },
+        "date": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "customerName", "customerWhatsApp", "productTitle", "amount"]
+    },
+    "settings": {
+      "title": "StoreSettings",
+      "description": "Store configuration and contact information",
+      "type": "object",
+      "properties": {
+        "brandName": { "type": "string" },
+        "tagline": { "type": "string" },
+        "brandStory": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "adminPassword": { "type": "string" },
+        "supportEmail": { "type": "string" },
+        "easypaisaAccount": { "type": "string" },
+        "jazzcashAccount": { "type": "string" },
+        "bankAccountDetails": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "products/{productId}": {
+      "schema": { "$ref": "#/entities/product" },
+      "description": "Collection of digital products"
+    },
+    "articles/{articleId}": {
+      "schema": { "$ref": "#/entities/article" },
+      "description": "Collection of articles and guides"
+    },
+    "orders/{orderId}": {
+      "schema": { "$ref": "#/entities/order" },
+      "description": "Collection of store orders"
+    },
+    "settings/general": {
+      "schema": { "$ref": "#/entities/settings" },
+      "description": "Store settings document"
+    }
+  }
+}

@@ -10,7 +10,7 @@ export const initialSettings: StoreSettings = {
   brandName: 'Hadi Digital Store',
   tagline: 'Premium Digital Solutions at Unbeatable Prices in Pakistan',
   brandStory: 'HDS is an ecosystem of trust. Join over 25,000+ elite creators who rely on our high-liquidity digital flows and dedicated 24/7 VIP concierge. Bilkul original services with replacement warranty.',
-  adminPassword: 'admin123',
+  adminPassword: 'Madni@yahoo12',
 };
 
 export const initialProducts: Product[] = [
