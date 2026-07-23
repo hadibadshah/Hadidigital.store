@@ -11,6 +11,7 @@ import { AboutView } from './views/AboutView';
 import { ArticlesView } from './views/ArticlesView';
 import { ContactView } from './views/ContactView';
 import { AdminView } from './views/AdminView';
+import { ProductDetailView } from './views/ProductDetailView';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
@@ -117,8 +118,23 @@ export default function App() {
           products={products}
           settings={settings}
           onBuyNow={handleBuyNow}
+          navigate={navigate}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+        />
+      );
+    }
+
+    if (currentPath.startsWith('/product/')) {
+      const parts = currentPath.split('/');
+      const param = parts.length > 2 ? parts[2] : '';
+      return (
+        <ProductDetailView
+          param={param}
+          products={products}
+          settings={settings}
+          onBuyNow={handleBuyNow}
+          navigate={navigate}
         />
       );
     }

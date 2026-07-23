@@ -7,6 +7,7 @@ interface ShopViewProps {
   products: Product[];
   settings: StoreSettings;
   onBuyNow: (product: Product) => void;
+  navigate?: (path: string) => void;
   searchQuery?: string;
   setSearchQuery?: (q: string) => void;
 }
@@ -15,6 +16,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
   products, 
   settings, 
   onBuyNow, 
+  navigate,
   searchQuery = '', 
   setSearchQuery 
 }) => {
@@ -84,6 +86,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
                 product={product}
                 settings={settings}
                 onBuyNow={onBuyNow}
+                navigate={navigate}
               />
             ))}
           </div>

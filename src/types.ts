@@ -8,6 +8,7 @@ export interface Product {
   category: 'Tools' | 'AI' | 'YouTube' | 'Course' | string;
   image: string; // Emoji or image URL
   description: string;
+  benefits?: string[];
   isHidden?: boolean;
   featured?: boolean;
 }

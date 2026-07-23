@@ -25,6 +25,14 @@ export const initialProducts: Product[] = [
     category: 'Tools',
     image: '🎬',
     description: 'Unlock all premium features, effects, motion tracking, cloud storage, and 4K exports without watermarks.',
+    benefits: [
+      'Export 4K UHD videos without CapCut watermark',
+      'Unlock all Pro AI Video Filters, Transitions & Text Animations',
+      'AI Auto-Captioning & Subtitle Generator in Urdu & English',
+      '100GB Cloud Storage & Multi-Device Sync (Windows/Mac/iOS/Android)',
+      'Instant Login Credentials delivered on WhatsApp within 5 minutes',
+      '100% Replacement Warranty for complete peace of mind'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -38,6 +46,14 @@ export const initialProducts: Product[] = [
     category: 'AI',
     image: '🎙️',
     description: 'Most advanced AI voice generator and speech synthesis software for ultra-realistic voiceovers.',
+    benefits: [
+      'Ultra-realistic human AI Voiceovers for YouTube & TikTok Shorts',
+      'Supports Urdu, English, Hindi, Arabic & 30+ Global Languages',
+      'Instant Voice Cloning & Custom AI Voice creation',
+      'High character limit for long-form video narrations',
+      'Commercial usage rights for monetized YouTube channels',
+      'Fast account setup & 24/7 dedicated support'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -51,6 +67,14 @@ export const initialProducts: Product[] = [
     category: 'AI',
     image: '🤖',
     description: 'GPT-4o & GPT-4 Full Early Access, DALL-E 3 image generation, custom GPTs, and web browsing.',
+    benefits: [
+      'Access GPT-4o & GPT-4 Turbo with fastest response speed',
+      'DALL-E 3 AI Image Generator included for HD visuals',
+      'Upload PDFs, Excel & Images for instant AI analysis',
+      'Browse live web & create custom AI GPT assistants',
+      'Private & secure account with replacement guarantee',
+      'Instant delivery on WhatsApp after payment'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -62,6 +86,12 @@ export const initialProducts: Product[] = [
     category: 'AI',
     image: '🧠',
     description: 'Super grok account with replace guarantee. Instant activation & unthrottled response speed.',
+    benefits: [
+      'Real-time access to X/Twitter data and live trends',
+      'Unrestricted AI reasoning & deep coding assistance',
+      'High-capacity token allowance for heavy AI tasks',
+      'Guaranteed replacement warranty & priority setup'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -73,6 +103,13 @@ export const initialProducts: Product[] = [
     category: 'YouTube',
     image: '⏱️',
     description: 'Elite 2024 secret method to complete 4000 watch hours safely, bypass copyright checks, and monetize.',
+    benefits: [
+      'Complete 4,000 YouTube Watch Hours safely in 3-7 days',
+      'Bypass copyright content ID strike checks safely',
+      'Step-by-step video guide & setup software included',
+      '100% Monetization approval guarantee',
+      'Direct 1-on-1 WhatsApp guidance from Hadi Digital Store'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -86,6 +123,14 @@ export const initialProducts: Product[] = [
     category: 'Course',
     image: '📚',
     description: 'Complete step-by-step masterclass to launch faceless automated channels and earn passive income.',
+    benefits: [
+      'Learn how to build faceless automated YouTube channels from scratch',
+      'Niche selection, viral video scripting & AI voiceover tools',
+      'Video editing strategies using CapCut & Premiere Pro',
+      'SEO techniques to rank videos on top of search results',
+      'Monetization blueprints (AdSense, Sponsorships, Affiliates)',
+      'Lifetime course updates & WhatsApp community access'
+    ],
     isHidden: false,
     featured: true,
   },
@@ -97,6 +142,13 @@ export const initialProducts: Product[] = [
     category: 'YouTube',
     image: '👥',
     description: 'Life-time guaranteed organic subscriber growth. Fast execution & 100% replacement guarantee.',
+    benefits: [
+      '100% Non-Drop YouTube Subscribers with Refill Guarantee',
+      'Organic speed drip-feed to keep channel safe',
+      'Helps complete 1,000 Subscribers requirement for monetization',
+      'No account password required (only channel link needed)',
+      '24/7 Order status tracking on WhatsApp'
+    ],
     isHidden: false,
     featured: true,
   },

@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Globe,
   DollarSign,
-  QrCode
+  QrCode,
+  Eye
 } from 'lucide-react';
 import { getWhatsAppLink } from '../lib/whatsapp';
 
@@ -117,15 +118,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
               return (
                 <div 
                   key={product.id}
-                  className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between backdrop-blur-md relative overflow-hidden group hover:border-[#f59e0b]/50 transition-all shadow-xl"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between backdrop-blur-md relative overflow-hidden group hover:border-[#f59e0b]/50 transition-all shadow-xl cursor-pointer"
                 >
                   <div className="absolute top-0 right-0 px-3 py-1 bg-[#f59e0b] text-[#0a1628] text-[10px] font-extrabold rounded-bl-xl uppercase tracking-wider">
                     {product.badge}
                   </div>
                   <div className="text-4xl mb-4">{product.image}</div>
                   <div>
-                    <h3 className="font-bold text-xl mb-1 text-white group-hover:text-[#f59e0b] transition-colors">
-                      {product.name}
+                    <h3 className="font-bold text-xl mb-1 text-white group-hover:text-[#f59e0b] transition-colors flex items-center justify-between">
+                      <span>{product.name}</span>
+                      <Eye className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-amber-400" />
                     </h3>
                     <p className="text-xs text-slate-400 line-clamp-2">{product.description}</p>
                   </div>
@@ -143,18 +146,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         href={waMsg}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         className="py-2 px-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold hover:bg-emerald-500/30 transition-all"
                       >
                         DM to Buy
                       </a>
                     ) : (
-                      <button 
-                        onClick={() => onBuyNow(product)}
-                        className="p-2.5 bg-white/10 rounded-xl hover:bg-[#f59e0b] hover:text-[#0a1628] transition-all text-white font-bold text-xs flex items-center gap-1"
-                      >
-                        <span>Buy</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onBuyNow(product);
+                          }}
+                          className="py-2 px-3 bg-white/10 rounded-xl hover:bg-[#f59e0b] hover:text-[#0a1628] transition-all text-white font-bold text-xs flex items-center gap-1"
+                        >
+                          <span>Buy</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

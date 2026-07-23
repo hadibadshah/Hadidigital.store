@@ -21,7 +21,9 @@ import {
   Copy,
   Code,
   Download,
-  Upload
+  Upload,
+  Link2,
+  ExternalLink
 } from 'lucide-react';
 import { saveProducts, saveOrders, saveArticles, saveSettings, resetAllData } from '../lib/storage';
 
@@ -60,6 +62,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
   // Edit Price Inline State: { [productId]: price }
   const [editingPrices, setEditingPrices] = useState<{ [key: number]: string }>({});
 
+  // Copy Link Feedback State
+  const [copiedLinkId, setCopiedLinkId] = useState<number | null>(null);
+  const [copiedModalLink, setCopiedModalLink] = useState(false);
+
   // Add / Edit Product Modal & Form State
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -72,6 +78,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
     badge: 'DEAL',
     image: '🎬',
     description: '',
+    benefitsText: '',
     isHidden: false,
     featured: true,
   });
@@ -87,9 +94,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
       badge: 'DEAL',
       image: '🎬',
       description: '',
+      benefitsText: '100% Genuine Subscription\nInstant Delivery on WhatsApp within 5 mins\nFull Replacement Warranty',
       isHidden: false,
       featured: true,
     });
+    setCopiedModalLink(false);
     setShowProductModal(true);
   };
 
@@ -104,9 +113,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
       badge: prod.badge || 'DEAL',
       image: prod.image || '📦',
       description: prod.description || '',
+      benefitsText: prod.benefits && prod.benefits.length > 0 ? prod.benefits.join('\n') : '',
       isHidden: !!prod.isHidden,
       featured: prod.featured !== false,
     });
+    setCopiedModalLink(false);
     setShowProductModal(true);
   };
 
@@ -145,8 +156,15 @@ export const AdminView: React.FC<AdminViewProps> = ({
     e.preventDefault();
     if (!productForm.name.trim() || !productForm.price.trim()) return;
 
+    const parsedBenefits = productForm.benefitsText
+      .split('\n')
+      .map((b) => b.trim())
+      .filter((b) => b.length > 0);
+
+    const productIdToUse = editingProductId ? editingProductId : Date.now();
+
     const updatedProd: Product = {
-      id: editingProductId ? editingProductId : Date.now(),
+      id: productIdToUse,
       name: productForm.name,
       price: productForm.price,
       originalPrice: productForm.originalPrice || undefined,
@@ -155,6 +173,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
       badge: productForm.badge,
       image: productForm.image || '📦',
       description: productForm.description,
+      benefits: parsedBenefits.length > 0 ? parsedBenefits : undefined,
       isHidden: productForm.isHidden,
       featured: productForm.featured,
     };
@@ -169,6 +188,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setProducts(updatedList);
     saveProducts(updatedList);
     setShowProductModal(false);
+  };
+
+  const handleCopyTableProductLink = (id: number) => {
+    const directUrl = `https://hadidigital.store/#/product/${id}`;
+    navigator.clipboard.writeText(directUrl);
+    setCopiedLinkId(id);
+    setTimeout(() => setCopiedLinkId(null), 3000);
   };
 
   // Add Article Modal State
@@ -605,7 +631,28 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       </td>
 
                       <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleCopyTableProductLink(product.id)}
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
+                              copiedLinkId === product.id
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                            }`}
+                            title="Copy Direct Product Link for Facebook / WhatsApp Catalog"
+                          >
+                            {copiedLinkId === product.id ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-300">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Link2 className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Copy Link</span>
+                              </>
+                            )}
+                          </button>
                           <button
                             onClick={() => handleOpenEditProduct(product)}
                             className="px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
@@ -1068,16 +1115,73 @@ export const AdminView: React.FC<AdminViewProps> = ({
               {/* Description */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Product Description / Key Benefits
+                  Main Product Summary / Overview
                 </label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={productForm.description}
                   onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white resize-none focus:border-amber-500 focus:outline-none"
-                  placeholder="Detailed description of features, account duration, replacement warranty..."
+                  placeholder="e.g. Unlock all CapCut Pro features, motion tracking, cloud storage, and 4K exports without watermarks."
                 />
               </div>
+
+              {/* Product Fayde / Key Benefits List */}
+              <div>
+                <label className="block text-xs font-semibold text-amber-400 mb-1 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Product Benefits & Features (Fayde) — Enter 1 benefit per line:</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={productForm.benefitsText}
+                  onChange={(e) => setProductForm({ ...productForm, benefitsText: e.target.value })}
+                  className="w-full bg-slate-950 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-200 resize-none focus:border-amber-500 focus:outline-none font-sans"
+                  placeholder="Export 4K UHD videos without watermark&#10;100GB Cloud Storage & Multi-Device Sync&#10;Urdu & English AI Auto-Captioning Generator&#10;100% Replacement Warranty included"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Each line will appear as a checkmarked feature / fayda on the dedicated product page!
+                </p>
+              </div>
+
+              {/* Direct Link Banner in Modal for Catalog & Social Media */}
+              {editingProductId && (
+                <div className="bg-slate-950/80 border border-amber-500/30 p-3.5 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                  <div className="space-y-0.5 overflow-hidden">
+                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+                      Direct Catalog & Social Media Share Link:
+                    </span>
+                    <div className="text-[11px] font-mono text-slate-300 truncate">
+                      https://hadidigital.store/#/product/{editingProductId}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://hadidigital.store/#/product/${editingProductId}`);
+                      setCopiedModalLink(true);
+                      setTimeout(() => setCopiedModalLink(false), 3000);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold shrink-0 transition-all flex items-center gap-1.5 ${
+                      copiedModalLink
+                        ? 'bg-emerald-500 text-slate-950'
+                        : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                    }`}
+                  >
+                    {copiedModalLink ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy Link</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
 
               {/* Visibility & Featured Checkboxes */}
               <div className="flex items-center gap-6 pt-1">
