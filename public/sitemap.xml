@@ -26,49 +26,49 @@
 
   <!-- Product Detail Pages for Direct Share & Google Search Indexing -->
   <url>
-    <loc>https://hadidigital.store/#/product/1</loc>
+    <loc>https://hadidigital.store/#/product/capcut-pro</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://hadidigital.store/#/product/elevenlabs-voice-ai</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://hadidigital.store/#/product/chatgpt-plus</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://hadidigital.store/#/product/grok-ai-pro</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://hadidigital.store/#/product/2</loc>
+    <loc>https://hadidigital.store/#/product/youtube-watch-hours-package</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://hadidigital.store/#/product/3</loc>
+    <loc>https://hadidigital.store/#/product/youtube-automation-masterclass</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://hadidigital.store/#/product/4</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://hadidigital.store/#/product/5</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://hadidigital.store/#/product/6</loc>
-    <lastmod>2026-07-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://hadidigital.store/#/product/7</loc>
+    <loc>https://hadidigital.store/#/product/youtube-subscribers</loc>
     <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

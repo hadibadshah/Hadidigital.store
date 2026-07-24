@@ -26,6 +26,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { saveProducts, saveOrders, saveArticles, saveSettings, resetAllData } from '../lib/storage';
+import { getProductSlug, getProductDirectUrl } from '../lib/slug';
 
 interface AdminViewProps {
   products: Product[];
@@ -190,10 +191,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setShowProductModal(false);
   };
 
-  const handleCopyTableProductLink = (id: number) => {
-    const directUrl = `https://hadidigital.store/#/product/${id}`;
+  const handleCopyTableProductLink = (prod: Product) => {
+    const directUrl = getProductDirectUrl(prod);
     navigator.clipboard.writeText(directUrl);
-    setCopiedLinkId(id);
+    setCopiedLinkId(prod.id);
     setTimeout(() => setCopiedLinkId(null), 3000);
   };
 
@@ -633,7 +634,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
-                            onClick={() => handleCopyTableProductLink(product.id)}
+                            onClick={() => handleCopyTableProductLink(product)}
                             className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 border ${
                               copiedLinkId === product.id
                                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
@@ -1145,20 +1146,20 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </div>
 
               {/* Direct Link Banner in Modal for Catalog & Social Media */}
-              {editingProductId && (
+              {(editingProductId || productForm.name) && (
                 <div className="bg-slate-950/80 border border-amber-500/30 p-3.5 rounded-2xl flex items-center justify-between gap-3 text-xs">
                   <div className="space-y-0.5 overflow-hidden">
                     <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
                       Direct Catalog & Social Media Share Link:
                     </span>
                     <div className="text-[11px] font-mono text-slate-300 truncate">
-                      https://hadidigital.store/#/product/{editingProductId}
+                      https://hadidigital.store/#/product/{getProductSlug(productForm.name || 'product')}
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://hadidigital.store/#/product/${editingProductId}`);
+                      navigator.clipboard.writeText(`https://hadidigital.store/#/product/${getProductSlug(productForm.name || 'product')}`);
                       setCopiedModalLink(true);
                       setTimeout(() => setCopiedModalLink(false), 3000);
                     }}

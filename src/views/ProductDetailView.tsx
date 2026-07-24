@@ -1,24 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product, StoreSettings } from '../types';
 import { 
   ShoppingCart, 
   MessageCircle, 
   Copy, 
   Check, 
-  Share2, 
   ShieldCheck, 
   CheckCircle2, 
   Sparkles, 
   ArrowLeft, 
   Clock, 
   Zap, 
-  ExternalLink,
   ChevronRight,
   Globe,
   Facebook
 } from 'lucide-react';
 import { getWhatsAppLink, createProductBuyMessage } from '../lib/whatsapp';
 import { ProductCard } from '../components/ProductCard';
+import { findProductByParam, getProductDirectUrl, getProductSlug } from '../lib/slug';
 
 interface ProductDetailViewProps {
   param: string;
@@ -37,12 +36,41 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  // Find product by ID or by name slug
-  const product = products.find((p) => {
-    if (String(p.id) === param) return true;
-    const slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return slug === param.toLowerCase();
-  });
+  // Find product by ID or slug string
+  const product = findProductByParam(products, param);
+
+  // Dynamic SEO Meta Tags & Document Title
+  useEffect(() => {
+    if (product) {
+      const slug = getProductSlug(product);
+      const pageTitle = `${product.name} in ${product.price} — ${settings.brandName} Pakistan`;
+      document.title = pageTitle;
+
+      const descText = `${product.name} available for ${product.price} at ${settings.brandName} Pakistan. ${product.description} 100% genuine digital access with instant WhatsApp setup & full replacement warranty.`;
+
+      // Helper function to set or create meta tags dynamically
+      const setMetaTag = (selector: string, attrName: string, attrVal: string, contentVal: string) => {
+        let element = document.querySelector(selector);
+        if (!element) {
+          element = document.createElement('meta');
+          element.setAttribute(attrName, attrVal);
+          document.head.appendChild(element);
+        }
+        element.setAttribute('content', contentVal);
+      };
+
+      setMetaTag('meta[name="description"]', 'name', 'description', descText);
+      setMetaTag('meta[property="og:title"]', 'property', 'og:title', pageTitle);
+      setMetaTag('meta[property="og:description"]', 'property', 'og:description', descText);
+      setMetaTag('meta[property="og:url"]', 'property', 'og:url', `https://hadidigital.store/#/product/${slug}`);
+      setMetaTag('meta[property="twitter:title"]', 'property', 'twitter:title', pageTitle);
+      setMetaTag('meta[property="twitter:description"]', 'property', 'twitter:description', descText);
+    }
+
+    return () => {
+      document.title = `${settings.brandName} - Premium Digital Tools & Services Pakistan`;
+    };
+  }, [product, settings.brandName]);
 
   if (!product) {
     return (
@@ -65,8 +93,8 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     );
   }
 
-  // Generate canonical direct product page link
-  const productDirectUrl = `https://hadidigital.store/#/product/${product.id}`;
+  // Canonical direct product page link using clean name slug
+  const productDirectUrl = getProductDirectUrl(product);
   const isDMToBuy = product.price === 'DM to Buy';
 
   const waMsg = createProductBuyMessage(product.name, product.price, settings.brandName) + `\nProduct Link: ${productDirectUrl}`;
@@ -140,10 +168,10 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
           <div className="space-y-1 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 text-amber-400 font-extrabold text-xs uppercase tracking-wider">
               <Sparkles className="w-4 h-4" />
-              <span>Direct Product Link for Catalog & Social Media Sharing</span>
+              <span>Direct Product Link for Facebook & WhatsApp Catalog</span>
             </div>
             <p className="text-xs text-slate-300">
-              Copy this link to attach on Facebook posts, Instagram bio, or WhatsApp Catalog:
+              Copy clean link to share on Facebook posts, Instagram bio, or WhatsApp Catalog:
             </p>
             <div className="text-[11px] font-mono text-amber-300/90 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-amber-500/30 truncate max-w-xl">
               {productDirectUrl}
@@ -163,7 +191,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               {copied ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Copied for Catalog!</span>
+                  <span>Copied Link!</span>
                 </>
               ) : (
                 <>
@@ -198,7 +226,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
           <div className="mt-3 p-3 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span>Link Copied! You can now paste this URL directly into your WhatsApp messages or Facebook catalog.</span>
+              <span>Clean link copied! URL: {productDirectUrl}</span>
             </div>
             <button onClick={() => setCopied(false)} className="text-emerald-400 hover:text-white">✕</button>
           </div>

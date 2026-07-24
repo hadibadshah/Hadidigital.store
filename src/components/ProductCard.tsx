@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product, StoreSettings } from '../types';
 import { MessageCircle, ShoppingCart, Sparkles, CheckCircle2, Eye, Link2, Check } from 'lucide-react';
 import { getWhatsAppLink, createProductBuyMessage } from '../lib/whatsapp';
+import { getProductSlug, getProductDirectUrl } from '../lib/slug';
 
 interface ProductCardProps {
   product: Product;
@@ -14,8 +15,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, settings, onB
   const [copied, setCopied] = useState(false);
   const isDMToBuy = product.price === 'DM to Buy';
 
-  const productUrl = `/product/${product.id}`;
-  const directLink = `https://hadidigital.store/#/product/${product.id}`;
+  const slug = getProductSlug(product);
+  const productUrl = `/product/${slug}`;
+  const directLink = getProductDirectUrl(product);
 
   const handleOpenDetails = (e: React.MouseEvent) => {
     e.stopPropagation();

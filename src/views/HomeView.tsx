@@ -22,6 +22,7 @@ import {
   Eye
 } from 'lucide-react';
 import { getWhatsAppLink } from '../lib/whatsapp';
+import { getProductSlug } from '../lib/slug';
 
 interface HomeViewProps {
   products: Product[];
@@ -118,7 +119,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               return (
                 <div 
                   key={product.id}
-                  onClick={() => navigate(`/product/${product.id}`)}
+                  onClick={() => navigate(`/product/${getProductSlug(product)}`)}
                   className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between backdrop-blur-md relative overflow-hidden group hover:border-[#f59e0b]/50 transition-all shadow-xl cursor-pointer"
                 >
                   <div className="absolute top-0 right-0 px-3 py-1 bg-[#f59e0b] text-[#0a1628] text-[10px] font-extrabold rounded-bl-xl uppercase tracking-wider">
