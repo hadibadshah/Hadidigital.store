@@ -14,6 +14,12 @@ import { AdminView } from './views/AdminView';
 import { ProductDetailView } from './views/ProductDetailView';
 import { CheckCircle2, X } from 'lucide-react';
 
+declare global {
+  interface Window {
+    fbq?: any;
+  }
+}
+
 export default function App() {
   // Application Persistent State
   const [products, setProducts] = useState<Product[]>([]);
@@ -68,6 +74,9 @@ export default function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') || '/';
       setCurrentPath(hash);
+      if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('track', 'PageView');
+      }
     };
 
     handleHashChange();
@@ -87,12 +96,35 @@ export default function App() {
   // Open Checkout Modal
   const handleBuyNow = (product: Product) => {
     setSelectedCheckoutProduct(product);
+    if (typeof window !== 'undefined' && window.fbq) {
+      const priceNum = parseFloat(product.price.replace(/[^0-9.]/g, '')) || 0;
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: product.name,
+        content_category: product.category,
+        content_ids: [product.id],
+        value: priceNum,
+        currency: 'PKR',
+      });
+    }
   };
 
   const handleOrderSuccess = (orderId: string) => {
     // Refresh orders list
     setOrders(getOrders());
     setOrderToastId(orderId);
+
+    if (typeof window !== 'undefined' && window.fbq) {
+      const priceNum = selectedCheckoutProduct 
+        ? (parseFloat(selectedCheckoutProduct.price.replace(/[^0-9.]/g, '')) || 0) 
+        : 0;
+      window.fbq('track', 'Purchase', {
+        content_name: selectedCheckoutProduct?.name || 'Digital Order',
+        value: priceNum,
+        currency: 'PKR',
+        order_id: orderId,
+      });
+    }
+
     setTimeout(() => {
       setOrderToastId(null);
     }, 6000);
